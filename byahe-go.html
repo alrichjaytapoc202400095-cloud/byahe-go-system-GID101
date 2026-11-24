@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Byahe Go — Ride Booking App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1E2A38;
+  --ink-soft:#64707E;
+  --ink-faint:#98A1AC;
+  --dark:#221C17;
+  --black:#050505;
+  --green:#146B43;
+  --green-deep:#2F6B3F;
+  --green-dark:#275C39;
+  --green-tint:#E9F4EC;
+  --orange:#FF6A13;
+  --red:#D92C20;
+  --line:#E6E8EC;
+  --line-strong:#26282D;
+  --field:#F4F5F7;
+  --gray-100:#F1F2F5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  min-height:100dvh;
+  background:radial-gradient(circle at 50% 0,#F2F3F6,#E7E9ED 70%);
+  font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  display:grid;place-items:center;
+  padding:14px;
+}
+h1,h2,h3,.btn,.brand-word,button{font-family:'Manrope','Inter',sans-serif}
+
+/* ============ Phone frame ============ */
+.phone{
+  position:relative;
+  width:min(100vw - 28px, 393px);
+  height:min(100dvh - 28px, 852px);
+  min-height:620px;
+  background:#fff;
+  border-radius:34px;
+  box-shadow:0 30px 90px rgba(15,23,42,.20),0 0 0 1px rgba(15,23,42,.05);
+  overflow:hidden;
+}
+@media (max-width:440px){
+  body{padding:0}
+  .phone{width:100vw;height:100dvh;min-height:0;border-radius:0;box-shadow:none}
+}
+
+/* ============ Screens ============ */
+.screen{
+  position:absolute;inset:0;
+  display:none;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  background:#fff;
+  scrollbar-width:none;overscroll-behavior:contain;
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:flex;animation:fadeIn .28s ease}
+.screen > *{flex:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ============ Shared components ============ */
+.btn{
+  display:flex;align-items:center;justify-content:center;
+  width:calc(100% - 48px);margin:0 24px;flex:none;
+  height:62px;border-radius:16px;background:var(--dark);color:#fff;
+  font-weight:700;font-size:17.5px;border:none;cursor:pointer;
+  letter-spacing:.2px;transition:filter .15s,transform .06s;
+}
+.btn:active{transform:scale(.985);filter:brightness(1.25)}
+.btn.black{background:#050505}
+.btn.greenline{background:#fff;color:var(--green-deep);border:1.6px solid var(--green)}
+.btn.plainline{background:#fff;color:var(--ink);border:1.5px solid var(--line-strong)}
+.btn.ghost{background:#fff;color:var(--green-deep);border:1.4px solid #E1E4EA}
+
+.field{display:flex;flex-direction:column;gap:9px}
+.field label{font-size:16.5px;font-weight:700;color:var(--ink)}
+.input{
+  height:64px;border-radius:14px;border:1.6px solid var(--line-strong);
+  background:var(--field);padding:0 20px;font-size:17.5px;color:var(--ink);
+  width:100%;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.input::placeholder{color:#9AA0A8;letter-spacing:.045em;font-weight:500}
+.input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(20,107,67,.13);background:#fff}
+.input.soft{border-color:#E1E4EA;background:#fff}
+.input.soft:focus{border-color:var(--green)}
+textarea.input{padding:18px 20px;height:auto;min-height:152px;resize:none;line-height:1.5}
+.pw-wrap{position:relative}
+.pw-wrap .input{padding-right:54px}
+.eye{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border:none;background:none;cursor:pointer;
+  color:#7A828E;display:grid;place-items:center;border-radius:10px;
+}
+.hint{font-size:15.5px;color:var(--ink-faint);line-height:1.45}
+.link-orange{color:var(--orange);font-weight:700;cursor:pointer}
+.link-ink{color:var(--ink);font-weight:800;cursor:pointer}
+.alt-row{text-align:center;font-size:16.5px;color:var(--ink-faint);margin-top:24px;margin-bottom:44px}
+.code-row{display:flex;gap:9px}
+.code-box{
+  width:100%;height:66px;text-align:center;font-size:22px;font-weight:700;
+  border:1.4px solid #E1E4EA;border-radius:14px;background:#fff;color:var(--ink);
+  outline:none;transition:border-color .15s;font-family:'Manrope';
+}
+.code-box:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(20,107,67,.13)}
+
+/* tops */
+.topbar{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;padding:16px 20px 8px;flex:none}
+.icon-led{width:47px;height:47px;border-radius:999px;background:var(--gray-100);border:none;cursor:pointer;display:grid;place-items:center;color:var(--ink);justify-self:start}
+.icon-led:active{filter:brightness(.92)}
+.t-title{text-align:center;font-weight:800;font-size:20.5px;letter-spacing:-.2px}
+.t-title.green{color:var(--green-deep)}
+.step-row{display:flex;align-items:center;justify-content:space-between;padding:12px 22px 0;flex:none}
+.plain-arrow{border:none;background:none;cursor:pointer;padding:6px;color:var(--ink)}
+.step-of{color:var(--ink-faint);font-size:16.5px}
+.brand-block{text-align:center;padding-top:36px;flex:none}
+.brand-block .word{font-size:29px;font-weight:800;letter-spacing:-.4px}
+.brand-block .tag{font-size:16.5px;color:var(--ink-faint);margin-top:8px}
+
+/* headings */
+.page-title{font-size:34px;font-weight:800;letter-spacing:-.5px;padding:0 24px;margin-top:26px}
+.page-sub{padding:0 24px;margin-top:12px;font-size:17.5px;line-height:1.55;color:var(--ink-soft)}
+.sec{font-size:19px;font-weight:800;padding:0 24px;margin:26px 0 12px;letter-spacing:-.2px}
+
+/* splash */
+.splash-body{margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:32px}
+.logo-circle{border-radius:999px;background:var(--green);display:grid;place-items:center;box-shadow:0 18px 42px rgba(20,107,67,.28)}
+.splash-logo{width:190px;height:190px}
+.splash-logo svg{width:96px;height:96px}
+.splash-title{font-size:47px;font-weight:800;letter-spacing:-1px}
+.splash-tag{font-size:17px;color:var(--ink-faint)}
+.splash .btn{margin-bottom:44px}
+
+/* login */
+.auth-head{text-align:center}
+.auth-brand{font-size:27px;font-weight:800;letter-spacing:-.4px;margin-top:26px}
+.login-logo{width:148px;height:148px;margin:30px auto 0}
+.login-logo svg{width:72px;height:72px}
+.auth-h{font-size:34px;font-weight:800;text-align:center;margin-top:42px;letter-spacing:-.5px}
+.form{padding:0 24px;display:flex;flex-direction:column;gap:18px;margin-top:34px}
+.center-link{text-align:center;font-weight:700;cursor:pointer}
+.register-head h1{font-size:31px;font-weight:800;text-align:center;margin-top:70px;letter-spacing:-.5px}
+
+/* home */
+.home-top{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;padding:20px 20px 4px}
+.hamburger{border:none;background:none;cursor:pointer;color:var(--ink);justify-self:start;padding:4px}
+.home-top .word{font-size:24px;font-weight:800;letter-spacing:.06em;text-align:center}
+.map{position:relative;margin:14px 24px 0;border:1.5px solid #E3E5EA;border-radius:22px;overflow:hidden;flex:none}
+.map svg{width:100%;height:100%;display:block}
+.pin-box{color:var(--orange)}
+.rowbox{display:flex;align-items:center;gap:11px;border:1.6px solid var(--line-strong);border-radius:16px;background:#fff;padding:0 20px;height:64px;font-size:17.5px;font-weight:500;margin:16px 24px 0;color:var(--ink)}
+.rowbox .rb-ic{color:#E5462C;flex:none;display:grid;place-items:center}
+.rowbox.gray{background:var(--gray-100)}
+.dest-row{display:flex;align-items:center;gap:12px;background:var(--gray-100);border:1.6px solid var(--line-strong);border-radius:16px;padding:0 11px 0 20px;height:66px;margin:14px 24px 0}
+.dest-row input{flex:1;min-width:0;border:none;background:transparent;font-size:17.5px;color:#3A4148;font-family:inherit;outline:none;font-weight:500}
+.edit-chip{background:#fff;border:1.4px solid var(--line-strong);border-radius:12px;padding:11px 21px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;flex:none;color:var(--ink)}
+.edit-chip:active{transform:scale(.96)}
+.choice-row{display:flex;gap:16px;padding:0 16px;margin-top:16px}
+.choice{flex:1;height:66px;border:1.6px solid var(--line-strong);border-radius:14px;background:#fff;font-size:18px;font-weight:800;color:var(--ink);cursor:pointer}
+.choice:active{transform:scale(.985)}
+
+/* segmented tabs */
+.seg{display:flex;background:var(--gray-100);border-radius:14px;padding:4px;margin:26px 24px 0}
+.seg button{flex:1;height:52px;border:0;background:transparent;border-radius:11px;font-weight:700;font-size:16px;color:#8A93A0;cursor:pointer;font-family:'Manrope';transition:.18s}
+.seg button.on{background:var(--green-dark);color:#fff;box-shadow:0 3px 8px rgba(20,60,40,.28)}
+
+/* trip cards */
+.trip-list{display:flex;flex-direction:column;gap:18px;padding:0 24px;margin-top:14px}
+.trip-card{border:1.5px solid var(--line);border-radius:20px;padding:17px 20px;background:#fff;cursor:pointer}
+.trip-card:active{background:#FAFBFC}
+.tc-top{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--ink-faint)}
+.badge{background:#DCF1E1;color:#2F6B3F;font-weight:700;font-size:13.5px;padding:7px 13px;border-radius:999px;font-family:'Manrope'}
+.badge.gray{background:#F1F2F4;color:#6A7280}
+.tc-route{display:flex;align-items:center;gap:12px;margin-top:13px}
+.tc-route .pin-ic{color:var(--orange);flex:none;display:grid;place-items:center}
+.tc-name{font-size:20px;font-weight:800;letter-spacing:-.2px}
+.tc-chev{margin-left:auto;color:#98A1AC;flex:none;display:grid;place-items:center}
+.tc-meta{display:flex;justify-content:space-between;align-items:center;margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
+.tc-meta .m{color:var(--ink-soft);font-size:15.5px}
+.tc-price{font-weight:800;font-size:23px;letter-spacing:-.3px}
+
+/* trip details */
+.td-top{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0;font-size:16.5px}
+.td-date{color:#8A93A0}
+.td-status{font-weight:800;color:var(--green-deep)}
+.td-status.gray{color:#7A828E}
+.loc-row{display:flex;gap:14px;align-items:flex-start;margin-top:22px}
+.loc-wrap{padding:0 24px}
+.loc-ic{flex:none;margin-top:3px;color:var(--orange);display:grid;place-items:center}
+.loc-lbl{color:#8A93A0;font-size:15.5px}
+.loc-val{font-weight:800;font-size:19px;margin-top:3px;letter-spacing:-.2px}
+.meta-pill{margin:24px 24px 0;height:60px;border:1.4px solid #E4E6EB;background:var(--field);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#2A3442;font-family:'Manrope'}
+
+/* cards */
+.driver-card{display:flex;align-items:center;gap:14px;border:1.8px solid var(--green);border-radius:20px;padding:13px 18px;margin:22px 24px 0}
+.avatar{border-radius:999px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;letter-spacing:.04em;flex:none}
+.drv-name{color:var(--green-deep);font-weight:800;font-size:19.5px;letter-spacing:-.2px}
+.drv-sub{color:#77808C;font-size:15px;margin-top:2px}
+.drv-rate{margin-left:auto;font-weight:800;font-size:19px;color:var(--green-deep)}
+.receipt{border:1.5px solid var(--line);border-radius:20px;padding:20px;margin:22px 24px 0}
+.receipt h3{font-size:20px;font-weight:800;letter-spacing:-.2px;margin-bottom:10px}
+.r-row{display:flex;justify-content:space-between;padding:9px 0;color:var(--ink-soft);font-size:16.5px}
+.r-row b{color:var(--ink);font-weight:700}
+.r-total{border-top:1px solid var(--line);margin-top:9px;padding-top:15px;display:flex;justify-content:space-between;color:var(--ink);font-size:20px}
+.r-total b{font-weight:800;font-size:24px;letter-spacing:-.3px}
+
+/* profile */
+.rep-header{background:var(--green-tint);border-radius:22px;margin:26px 24px 0;padding:30px 20px;text-align:center}
+.rep-ava{width:78px;height:78px;font-size:24px;margin:0 auto}
+.rep-name{color:var(--green-deep);font-weight:800;font-size:22px;margin-top:16px;letter-spacing:-.2px}
+.rep-phone{color:#77808C;font-size:16.5px;margin-top:7px}
+.rep-sub{color:#2F5F3B;font-size:15.5px;margin-top:13px}
+.menu-col{display:flex;flex-direction:column;gap:14px;padding:0 24px;margin-top:24px}
+.menu-item{display:flex;align-items:center;gap:14px;padding:15px 18px;border:1.5px solid #E8EAEE;border-radius:18px;background:#fff;cursor:pointer;text-align:left;font-family:inherit}
+.menu-item:active{background:#FAFBFC}
+.menu-item > span:nth-of-type(2){flex:1;min-width:0;display:block}
+.mi-bubble{width:47px;height:47px;border-radius:999px;background:var(--gray-100);display:grid;place-items:center;color:#3A4654;flex:none}
+.mi-title{display:block;font-size:17.5px;font-weight:800;color:var(--ink);font-family:'Manrope'}
+.mi-sub{display:block;font-size:14.5px;color:#8A93A0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi-chev{margin-left:auto;color:#98A1AC;flex:none;display:grid;place-items:center}
+.tagline-center{text-align:center;color:#98A1AC;font-size:15.5px;margin-top:20px;margin-bottom:40px}
+
+/* choose ride */
+.option-list{display:flex;flex-direction:column;gap:16px;padding:0 24px}
+.veh{display:flex;align-items:center;justify-content:space-between;height:78px;border:1.7px solid var(--line-strong);border-radius:16px;background:#fff;padding:0 22px;cursor:pointer;width:100%}
+.veh .vn{font-size:20.5px;font-weight:600;color:var(--ink);font-family:'Inter'}
+.veh .vp{font-size:21.5px;font-weight:800;letter-spacing:-.3px}
+.veh.on{border-color:var(--green);border-width:2px}
+.veh.on .vp{color:var(--green-deep)}
+.payrow{display:flex;align-items:center;height:66px;border:1.5px solid var(--line-strong);border-radius:16px;padding:0 22px;font-size:18px;color:#39414B;cursor:pointer;background:#fff;font-weight:500}
+.routecard{background:#F2F3F6;border-radius:18px;padding:15px 18px;border:1.3px solid #E4E6EB}
+.rc-lbl{color:#8A93A0;font-size:14.5px}
+.rc-name{font-weight:800;font-size:16.5px;margin-top:4px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-meta{color:#8A93A0;font-size:14.5px;margin-top:5px}
+
+/* ride in progress */
+.onway{background:#EDEEF0;border-radius:18px;padding:16px 18px;border:1px solid #E4E6EB}
+.onway .lbl{color:#77808C;font-size:15.5px}
+.onway .val{font-weight:800;font-size:20px;margin-top:5px;letter-spacing:-.2px}
+.ride-meta{display:flex;justify-content:space-between;align-items:center;border:1.5px solid #E7E9EE;border-radius:16px;height:66px;padding:0 22px;margin:16px 24px 0}
+.ride-meta .l{font-size:17.5px;color:#3A4450;font-weight:500}
+.ride-meta .v{font-weight:800;font-size:20px;color:var(--green-deep)}
+.action-row{display:flex;gap:14px;padding:0 24px;margin-top:16px}
+.btn-ghost{height:68px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:11px;font-weight:800;font-size:17.5px;cursor:pointer;flex:1;font-family:'Manrope'}
+.btn-ghost:active{transform:scale(.98)}
+.bg-green{border:1.8px solid var(--green);color:var(--green-deep);background:#fff}
+.bg-red{border:1.8px solid var(--red);color:var(--red);background:#fff}
+.sos-note{display:flex;gap:12px;margin:18px 24px 0;align-items:flex-start}
+.sos-note svg{flex:none;margin-top:2px;color:var(--green-deep)}
+.sos-note p{color:#8A93A0;font-size:15.5px;line-height:1.5}
+.stay{margin:22px 16px 34px;background:#040404;color:#fff;height:70px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex:none}
+
+/* ride complete */
+.arrive-ic{width:118px;height:118px;border-radius:999px;background:var(--green-tint);display:grid;place-items:center;margin:16px auto 0}
+.arrive-title{text-align:center;font-size:35px;font-weight:800;letter-spacing:-.7px;margin-top:20px}
+.arrive-dest{text-align:center;font-size:19.5px;font-weight:600;color:#3A4654;margin-top:10px}
+.arrive-meta{text-align:center;color:#8A93A0;font-size:16.5px;margin-top:7px}
+.farecard{background:var(--green-tint);border-radius:20px;padding:22px;text-align:center}
+.fare-label{color:#2F6B3F;font-weight:600;font-size:16.5px}
+.fare-amount{font-size:56px;font-weight:800;color:#2F6B3F;letter-spacing:-1.5px;margin-top:2px}
+.fare-sub{color:#77808C;font-size:15.5px;margin-top:4px}
+.rate-title{text-align:center;font-size:22px;font-weight:800;margin-top:34px;letter-spacing:-.3px}
+.star-row{display:flex;justify-content:center;gap:19px;margin-top:18px}
+.star{cursor:pointer;transition:transform .12s;background:none;border:none;padding:0}
+.star svg{width:44px;height:44px;display:block}
+.star path{fill:none;stroke:var(--green);stroke-width:1.4;transition:fill .15s}
+.star.on path{fill:var(--green)}
+.star:active{transform:scale(.88)}
+.rate-hint{text-align:center;color:#8A93A0;font-size:15.5px;margin-top:13px}
+.receipt-link{text-align:center;font-weight:800;font-size:17px;color:var(--ink);cursor:pointer;margin:22px 0 40px}
+
+/* bottom nav */
+.bottom-nav{
+  position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #F0F1F4;
+  display:flex;padding:10px 6px 16px;z-index:30;
+  opacity:0;pointer-events:none;transform:translateY(10px);transition:.25s;
+}
+.phone.nav-on .bottom-nav{opacity:1;pointer-events:auto;transform:none}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:#7C8492;font-family:'Manrope';font-weight:700;font-size:12.5px;padding-top:4px}
+.nav-item.on{color:#2F5B38}
+.nav-item svg{width:25px;height:25px}
+.nav-space{padding-bottom:108px}
+
+/* drawer */
+.drawer{position:absolute;inset:0;z-index:50;visibility:hidden}
+.drawer.open{visibility:visible}
+.drawer .scrim{position:absolute;inset:0;background:rgba(16,22,30,.42);opacity:0;transition:.25s}
+.drawer.open .scrim{opacity:1}
+.drawer .panel{position:absolute;top:0;bottom:0;left:0;width:80%;max-width:300px;background:#fff;transform:translateX(-103%);transition:.28s ease;display:flex;flex-direction:column;padding:28px 20px;box-shadow:0 0 44px rgba(0,0,0,.18)}
+.drawer.open .panel{transform:none}
+.drawer-brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:21px;font-family:'Manrope'}
+.db-logo{width:42px;height:42px;border-radius:999px;background:var(--green);display:grid;place-items:center;flex:none}
+.d-item{display:flex;align-items:center;gap:14px;padding:14px 12px;border:none;background:none;border-radius:12px;font-size:17px;font-weight:600;font-family:'Manrope';color:var(--ink);cursor:pointer;text-align:left;margin-top:6px}
+.d-item:hover{background:var(--field)}
+.d-item svg{color:#3A4654}
+.d-sign{margin-top:auto;color:#B4261B}
+.d-sign svg{color:#B4261B}
+.drawer-foot{color:#98A1AC;font-size:13.5px;padding:12px}
+
+/* toast */
+.toast{
+  position:absolute;left:50%;bottom:112px;transform:translate(-50%,16px);
+  background:#20242B;color:#fff;padding:12px 18px;border-radius:12px;font-size:15px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:85%;text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+<body>
+<div class="phone" id="phone">
+
+  <!-- ==================== SVG asset definitions (map background, pins) ==================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <g id="mapbg">
+      <rect width="400" height="300" fill="#EBEDF0"/>
+      <path d="M96 0c26 30 18 66 2 96-16 32-10 60 12 84 16 18 14 60-6 120l-62 0c8-60 0-84-22-108-18-20-16-58 4-92C39 74 34 34 44 0Z" fill="#FAFBFC"/>
+      <path d="M230 34c20-12 46-4 54 12 10 20 30 24 48 18 22-8 46 4 50 22 6 26-10 44-32 52-18 8-24 22-20 40 6 24-8 40-30 40-18 0-28-12-32-28-4-18-18-28-34-32-16-4-22-24-14-40 10-22 20-42 10-84z" fill="#FAFBFC"/>
+      <path d="M0 118c40 6 60-18 96-14 34 4 46 26 82 26 38 0 52-22 92-16 40 6 66 28 130 22" fill="none" stroke="#FAFBFC" stroke-width="26" opacity=".9"/>
+      <g stroke="#DFE2E7" stroke-width="1.6">
+        <path d="M22 0V300M60 0V300M98 0V300M136 0V300M174 0V300M212 0V300M250 0V300M288 0V300M326 0V300M364 0V300"/>
+        <path d="M0 28H400M0 62H400M0 96H400M0 130H400M0 164H400M0 198H400M0 232H400M0 266H400"/>
+      </g>
+      <g stroke="#D2D6DC" stroke-width="3.4" fill="none" stroke-linecap="round">
+        <path d="M-10 208C70 190 140 208 210 170S350 90 410 66"/>
+        <path d="M-10 96C60 108 120 70 196 78S320 132 410 120"/>
+        <path d="M60 310C90 236 190 232 250 176S340 60 400 22"/>
+      </g>
+      <g stroke="#E3E6EA" stroke-width="2" fill="none" stroke-linecap="round">
+        <path d="M-10 46C90 40 150 20 410 44"/>
+        <path d="M-10 262C120 268 240 240 410 250"/>
+        <path d="M150 -10C150 60 190 90 180 170S210 260 200 310"/>
+      </g>
+    </g>
+    <symbol id="mappin" viewBox="0 0 24 32" overflow="visible">
+      <path d="M12 1C6.2 1 1.6 5.6 1.6 11.4c0 7.6 10.4 18.6 10.4 18.6S22.4 19 22.4 11.4C22.4 5.6 17.8 1 12 1z" fill="#FF6A13"/>
+      <circle cx="12" cy="11.4" r="3.7" fill="#fff"/>
+    </symbol>
+    <symbol id="pinmini" viewBox="0 0 24 24">
+      <path d="M12 2c-4 0-7.2 3.2-7.2 7.2 0 5.4 7.2 13.6 7.2 13.6s7.2-8.2 7.2-13.6C19.2 5.2 16 2 12 2z" fill="currentColor"/>
+      <circle cx="12" cy="9.4" r="2.7" fill="#fff"/>
+    </symbol>
+    <symbol id="ringdot" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7.2" fill="none" stroke="currentColor" stroke-width="2.7"/>
+      <circle cx="12" cy="12" r="2.7" fill="currentColor"/>
+    </symbol>
+  </defs></svg>
+
+  <!-- ==================== 1 · SPLASH ==================== -->
+  <section class="screen splash active" id="splash">
+    <div class="splash-body">
+      <div class="logo-circle splash-logo" id="splashLogo">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="18.5" r="8.5"/>
+          <path d="M14 25 24 41.5 34 25"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="splash-title">Byahe Go</h1>
+        <p class="splash-tag" style="margin-top:12px">Safe rides. Fair fares. Fast.</p>
+      </div>
+    </div>
+    <button class="btn" data-go="login">Tap to continue</button>
+  </section>
+
+  <!-- ==================== 2 · LOG IN ==================== -->
+  <section class="screen" id="login">
+    <div class="auth-head">
+      <h2 class="auth-brand brand-word">Byahe Go</h2>
+      <div class="logo-circle login-logo">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="18.5" r="8.5"/>
+          <path d="M14 25 24 41.5 34 25"/>
+        </svg>
+      </div>
+      <h1 class="auth-h">Welcome back</h1>
+    </div>
+    <form class="form" id="loginForm" novalidate>
+      <input class="input" id="lgMobile" type="tel" placeholder="Mobile number" autocomplete="tel">
+      <div class="pw-wrap">
+        <input class="input" id="lgPass" type="password" placeholder="Password" autocomplete="current-password">
+      </div>
+      <div class="center-link link-orange" data-go="forgot1" style="font-size:16.5px">Forgot Password</div>
+      <button class="btn" type="submit" style="margin-top:10px">Log in</button>
+    </form>
+    <p class="alt-row">New here? <b class="link-ink brand-word" data-go="register">Register</b></p>
+  </section>
+
+  <!-- ==================== 3 · REGISTER ==================== -->
+  <section class="screen" id="register">
+    <div class="register-head"><h1>Create account</h1></div>
+    <form class="form" id="registerForm" novalidate style="margin-top:40px">
+      <input class="input" id="rgName" type="text" placeholder="Full name" autocomplete="name">
+      <input class="input" id="rgMobile" type="tel" placeholder="Mobile number" autocomplete="tel">
+      <input class="input" id="rgPass" type="password" placeholder="Password" autocomplete="new-password">
+      <p class="hint" style="text-align:center">Use 8+ characters with a mix of letters and numbers.</p>
+      <button class="btn" type="submit" style="margin-top:12px">Register</button>
+    </form>
+    <p class="alt-row">Have an account? <b class="link-ink brand-word" data-go="login">Log in</b></p>
+  </section>
+
+  <!-- ==================== 4 · FORGOT PASSWORD · STEP 1 ==================== -->
+  <section class="screen" id="forgot1">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="login">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 1 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Forgot password?</h1>
+    <p class="page-sub" style="margin-top:14px">Enter the mobile number linked to your account. We’ll send you a recovery code by SMS.</p>
+    <form class="form" id="fpForm" novalidate style="margin-top:30px">
+      <div class="field">
+        <label for="fpMobile">Mobile number</label>
+        <input class="input soft" id="fpMobile" type="tel" value="+63 917 555 0124">
+      </div>
+      <button class="btn" type="submit" style="margin-top:14px">Send code</button>
+    </form>
+    <p class="center-link link-ink brand-word" data-go="login" style="margin-top:26px;font-size:17px;margin-bottom:40px">Back to log in</p>
+  </section>
+
+  <!-- ==================== 5 · FORGOT PASSWORD · STEP 2 (verify code) ==================== -->
+  <section class="screen" id="forgot2">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="forgot1">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 2 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Verify recovery code</h1>
+    <p class="page-sub" style="margin-top:14px">Enter the six-digit code we sent to your mobile number <b id="fpSub" style="color:var(--ink)">+63 917 ••• 0124</b>.</p>
+    <form class="form" novalidate style="margin-top:30px">
+      <div class="field">
+        <label for="c1">Six-digit code</label>
+        <div class="code-row">
+          <input class="code-box" id="c1" type="text" inputmode="numeric" maxlength="1" value="4" autocomplete="one-time-code">
+          <input class="code-box" id="c2" type="text" inputmode="numeric" maxlength="1" value="8">
+          <input class="code-box" id="c3" type="text" inputmode="numeric" maxlength="1" value="2">
+          <input class="code-box" id="c4" type="text" inputmode="numeric" maxlength="1" value="6">
+          <input class="code-box" id="c5" type="text" inputmode="numeric" maxlength="1" value="1">
+          <input class="code-box" id="c6" type="text" inputmode="numeric" maxlength="1" value="9">
+        </div>
+      </div>
+      <button class="btn" type="button" id="btnVerify" style="margin-top:14px">Verify code</button>
+    </form>
+    <p class="center-link" style="margin-top:22px;font-size:16.5px;color:var(--ink-soft)">Didn’t get a code? <span class="link-orange" id="btnResend">Resend code</span></p>
+    <p class="center-link link-ink brand-word" data-go="forgot1" style="margin-top:18px;font-size:17px;margin-bottom:40px">Use a different mobile number</p>
+  </section>
+
+  <!-- ==================== 6 · FORGOT PASSWORD · STEP 3 (reset) ==================== -->
+  <section class="screen" id="forgot3">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="forgot2">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 3 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Reset password</h1>
+    <p class="page-sub" style="margin-top:14px">Choose a new password to keep your Byahe Go account secure.</p>
+    <form class="form" id="resetForm" novalidate style="margin-top:28px">
+      <div class="field">
+        <label for="fpNew">New password</label>
+        <div class="pw-wrap">
+          <input class="input soft" id="fpNew" type="password" value="newpass123">
+          <button class="eye" type="button" data-eye="fpNew">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.7"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="hint">Use 8+ characters with a mix of letters and numbers.</p>
+      <div class="field">
+        <label for="fpConf">Confirm new password</label>
+        <div class="pw-wrap">
+          <input class="input soft" id="fpConf" type="password" value="newpass123">
+          <button class="eye" type="button" data-eye="fpConf">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.7"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn" type="submit" style="margin-top:14px">Reset password</button>
+    </form>
+    <p class="center-link link-ink brand-word" data-go="login" style="margin-top:24px;font-size:17px;margin-bottom:40px">Back to log in</p>
+  </section>
+
+  <!-- ==================== 7 · HOME / BOOKING ==================== -->
+  <section class="screen with-nav" id="home" data-tab="home">
+    <div class="home-top">
+      <button class="hamburger" id="btnMenu">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"/></svg>
+      </button>
+      <div class="word brand-word">Byahe Go</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:300px">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path d="M100 78 L138 118 L158 140 L184 124 L198 162 L228 196 L256 210 L268 216" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="46" height="62" x="77" y="20"/>
+        <use href="#mappin" width="46" height="62" x="245" y="158"/>
+      </svg>
+    </div>
+    <div class="rowbox">
+      <span class="rb-ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5C8.6 18.4 4.8 14.3 4.8 10a7.2 7.2 0 1 1 14.4 0c0 4.3-3.8 8.4-7.2 11.5z"/><circle cx="12" cy="10" r="2.7"/></svg>
+      </span>
+      Pickup: My location
+    </div>
+    <div class="dest-row">
+      <input id="homeDest" value="Sta Felomina Iligan City" readonly>
+      <button class="edit-chip" id="homeEdit">Edit</button>
+    </div>
+    <div class="choice-row">
+      <button class="choice" data-quick="Home">Home</button>
+      <button class="choice" data-quick="School">School</button>
+    </div>
+    <button class="btn" id="btnFind" style="margin-top:18px">Find a ride</button>
+    <div class="nav-space"></div>
+  </section>
+
+  <!-- ==================== 8 · CHOOSE YOUR RIDE ==================== -->
+  <section class="screen" id="ridebook">
+    <div class="topbar">
+      <button class="icon-led" data-go="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Choose your ride</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:212px;margin-top:12px">
+      <svg viewBox="0 10 400 240" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path d="M96 62 L134 100 L154 122 L182 104 L198 142 L228 176 L256 190 L270 196" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="40" height="54" x="76" y="11"/>
+        <use href="#mappin" width="40" height="54" x="250" y="145"/>
+        <g transform="translate(196 136)">
+          <circle r="16.5" fill="#146B43" stroke="#fff" stroke-width="3"/>
+          <path d="M-6 -5.4 L7.3 0 L-6 5.4 L-2.8 0 Z" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="routecard" style="margin:16px 24px 0">
+      <div class="rc-lbl">Route</div>
+      <div class="rc-name" id="rbDest">My location → Sta Felomina Iligan City</div>
+      <div class="rc-meta" id="rbMeta">4.2 km • 12 mins</div>
+    </div>
+    <div class="dest-row" style="margin-top:14px;background:#fff;border-color:var(--line-strong)">
+      <span style="font-weight:600">To:</span>
+      <input id="rbDestInput" value="Sta Felomina Iligan City" readonly>
+      <button class="edit-chip" id="rbEdit">Edit</button>
+    </div>
+    <h3 class="sec" style="margin-bottom:14px">Vehicle options</h3>
+    <div class="option-list">
+      <button class="veh on" data-v="Motorcycle">
+        <span class="vn">Motorcycle</span><span class="vp" id="vpMotor">₱80</span>
+      </button>
+      <button class="veh" data-v="Car">
+        <span class="vn">Car</span><span class="vp" id="vpCar">₱120</span>
+      </button>
+    </div>
+    <button class="payrow" id="payRow" style="margin:18px 24px 0">Payment: <span id="payLbl" style="color:var(--ink);font-weight:600">&nbsp;Cash</span></button>
+    <button class="btn" id="btnConfirm" style="margin-top:28px">Confirm booking</button>
+    <div style="height:44px;flex:none"></div>
+  </section>
+
+  <!-- ==================== 9 · RIDE IN PROGRESS ==================== -->
+  <section class="screen" id="riding">
+    <div class="topbar">
+      <button class="icon-led" data-go="ridebook">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title green">Ride in progress</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:298px">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path id="rideRt" d="M100 78 L138 118 L158 140 L184 124 L198 162 L228 196 L256 210 L268 216" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="46" height="62" x="77" y="20"/>
+        <use href="#mappin" width="46" height="62" x="245" y="158"/>
+        <g id="rideVeh" transform="translate(100 78)">
+          <circle r="17" fill="#146B43" stroke="#fff" stroke-width="3.2"/>
+          <path d="M-6.3 -5.6 L7.5 0 L-6.3 5.6 L-2.9 0 Z" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="meta-pill" style="margin-top:14px" id="rdPill">Trip route: 4.2 km • 12 mins</div>
+    <div class="onway" style="margin:14px 24px 0">
+      <div class="lbl">On your way to</div>
+      <div class="val" id="rdDest">Sta Felomina Iligan City</div>
+    </div>
+    <div class="driver-card">
+      <span class="avatar" style="width:56px;height:56px;font-size:17px" id="drvAva">AJT</span>
+      <div>
+        <div class="drv-name">Alrich Jay Tapoc</div>
+        <div class="drv-sub">Honda Click ABC 123</div>
+      </div>
+      <div class="drv-rate">4.9/5</div>
+    </div>
+    <div class="ride-meta">
+      <span class="l" id="rmItem">Motorcycle • Cash</span>
+      <span class="v" id="rmPrice">₱80</span>
+    </div>
+    <div class="action-row">
+      <button class="btn-ghost bg-green" id="btnShare">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.4 10.8 7.2-4.4M8.4 13.2l7.2 4.4"/></svg>
+        Share trip
+      </button>
+      <button class="btn-ghost bg-red" id="btnSos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="M12 8v5M12 16.2h.01"/></svg>
+        SOS
+      </button>
+    </div>
+    <div class="sos-note">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="m9.3 11.8 2 2 4-4"/></svg>
+      <p>Share your trip with someone you trust. Use SOS if you need urgent help.</p>
+    </div>
+    <div class="stay">Enjoy your ride. Stay safe!</div>
+  </section>
+
+  <!-- ==================== 10 · RIDE COMPLETE ==================== -->
+  <section class="screen" id="complete">
+    <div class="topbar">
+      <button class="icon-led" data-go="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title green" style="color:#2F5B38">Ride complete</div>
+      <span></span>
+    </div>
+    <div class="arrive-ic">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#2F6B3F" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.2 4.2L19 7"/></svg>
+    </div>
+    <h1 class="arrive-title">You’ve arrived!</h1>
+    <div class="arrive-dest" id="cmDest">Sta Felomina Iligan City</div>
+    <div class="arrive-meta" id="cmMeta">Motorcycle • 4.2 km • 12 mins</div>
+    <div class="farecard" style="margin:28px 24px 0">
+      <div class="fare-label" id="cmFareLbl">Total fare • Cash</div>
+      <div class="fare-amount" id="cmFare">₱80</div>
+      <div class="fare-sub">Please pay your driver in cash.</div>
+    </div>
+    <h2 class="rate-title">How was your ride?</h2>
+    <div class="star-row">
+      <button class="star" data-s="1" aria-label="1 star"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="2" aria-label="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="3" aria-label="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="4" aria-label="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="5" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+    </div>
+    <p class="rate-hint">Tap a star to rate Alrich</p>
+    <div class="field" style="padding:0 24px;margin-top:26px">
+      <label>Feedback (optional)</label>
+      <textarea class="input soft" id="cmFeed" placeholder="Tell us about your ride"></textarea>
+    </div>
+    <button class="btn black" id="btnDone" style="margin-top:26px">Done — Back to Home</button>
+    <p class="receipt-link" id="cmReceipt">View trip receipt</p>
+  </section>
+
+  <!-- ==================== 11 · TRIPS ==================== -->
+  <section class="screen with-nav" id="trips" data-tab="trips">
+    <h1 class="page-title" style="margin-top:42px">Trips</h1>
+    <div class="seg">
+      <button class="on" data-f="Completed">Completed</button>
+      <button data-f="Cancelled">Cancelled</button>
+    </div>
+    <p class="sec" style="font-size:18px;margin-top:26px">Recent trips</p>
+    <div class="trip-list" id="tripList" style="padding-bottom:116px"></div>
+  </section>
+
+  <!-- ==================== 12 · TRIP DETAILS ==================== -->
+  <section class="screen" id="tripdetails">
+    <div class="topbar">
+      <button class="icon-led" data-go="trips">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Trip details</div>
+      <span></span>
+    </div>
+    <div class="td-top">
+      <span class="td-date" id="duDate">3 Nov 2026 • 10:24 AM</span>
+      <span class="td-status" id="duStatus">Completed</span>
+    </div>
+    <div class="map" style="height:150px;margin-top:14px">
+      <svg viewBox="0 30 400 250" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+      </svg>
+    </div>
+    <div class="loc-wrap">
+      <div class="loc-row">
+        <span class="loc-ic"><svg width="23" height="23" viewBox="0 0 24 24"><use href="#ringdot" width="24" height="24" color="#FF6A13"/></svg></span>
+        <div><div class="loc-lbl">Pickup</div><div class="loc-val">My location</div></div>
+      </div>
+      <div class="loc-row">
+        <span class="loc-ic"><svg width="23" height="23" viewBox="0 0 24 24"><use href="#pinmini" width="24" height="24" color="#FF6A13"/></svg></span>
+        <div><div class="loc-lbl">Destination</div><div class="loc-val" id="duDest">Sta Felomina Iligan City</div></div>
+      </div>
+    </div>
+    <div class="meta-pill" id="duPill">Motorcycle • 4.2 km • 12 mins</div>
+    <div class="driver-card">
+      <span class="avatar" style="width:56px;height:56px;font-size:17px">AJT</span>
+      <div>
+        <div class="drv-name">Alrich Jay Tapoc</div>
+        <div class="drv-sub">Honda Click ABC 123</div>
+      </div>
+      <div class="drv-rate">4.9/5</div>
+    </div>
+    <div class="receipt">
+      <h3>Payment receipt</h3>
+      <div class="r-row"><span id="duFareLbl">Motorcycle fare</span><b id="duFare">₱80</b></div>
+      <div class="r-row"><span>Payment method</span><b id="duMethod">Cash</b></div>
+      <div class="r-total"><span>Total paid</span><b id="duTotal">₱80</b></div>
+    </div>
+    <button class="btn ghost" id="btnHelp" style="margin-top:22px;font-weight:800">Get help with this trip</button>
+    <p class="tagline-center" style="margin:18px 0 40px" id="duRef">Trip reference: BG-261103-024</p>
+  </section>
+
+  <!-- ==================== 13 · PROFILE ==================== -->
+  <section class="screen with-nav" id="profile" data-tab="profile">
+    <h1 class="page-title" style="margin-top:42px">Profile</h1>
+    <div class="rep-header">
+      <span class="avatar rep-ava" id="pfAva">AJT</span>
+      <div class="rep-name" id="pfName">Alrich Jay Tapoc</div>
+      <div class="rep-phone" id="pfPhone">+63 917 ••• 0124</div>
+      <div class="rep-sub">Byahe Go rider • Iligan City</div>
+    </div>
+    <div class="menu-col">
+      <button class="menu-item" data-go="editprofile">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.2 8.8a2.3 2.3 0 0 0-3.2-3.2L4.6 16.2 4 20z"/><path d="M14.5 7.3l2.2 2.2"/></svg></span>
+        <span><span class="mi-title">Edit profile</span><div class="mi-sub">Update your name and mobile number</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Saved places coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-4.4L6 20V5.5a1 1 0 0 1 1-1z"/></svg></span>
+        <span><span class="mi-title">Saved places</span><div class="mi-sub">Home and School</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Safety center coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="m9.3 11.8 2 2 4-4"/></svg></span>
+        <span><span class="mi-title">Safety</span><div class="mi-sub">Emergency contacts and ride safety</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Help center coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.3c-.75.35-1 .95-1 1.7M12 17h.01"/></svg></span>
+        <span><span class="mi-title">Help center</span><div class="mi-sub">Trip support and common questions</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+    </div>
+    <button class="btn greenline" id="btnSignout" style="margin-top:26px;display:flex;gap:10px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+      Sign out
+    </button>
+    <p class="tagline-center" style="padding-bottom:0">Safe rides. Fair fares. Fast.</p>
+    <div class="nav-space"></div>
+  </section>
+
+  <!-- ==================== 14 · EDIT PROFILE ==================== -->
+  <section class="screen" id="editprofile">
+    <div class="topbar">
+      <button class="icon-led" data-go="profile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Edit profile</div>
+      <span></span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px">
+      <span class="avatar" style="width:96px;height:96px;font-size:27px" id="epAva">AJT</span>
+      <p style="color:#64707E;font-size:17px;text-align:center;margin-top:22px;padding:0 26px;line-height:1.55">Keep your details up to date so your driver can reach you.</p>
+    </div>
+    <form class="form" id="epForm" novalidate style="margin-top:28px">
+      <div class="field">
+        <label for="epName">Full name</label>
+        <input class="input soft" id="epName" value="Alrich Jay Tapoc">
+      </div>
+      <div class="field">
+        <label for="epMobile">Mobile number</label>
+        <input class="input soft" id="epMobile" type="tel" value="+63 917 555 0124">
+      </div>
+      <p class="hint">Use an active Philippine mobile number for ride updates and account recovery.</p>
+      <button class="btn" type="submit" style="margin-top:16px">Save changes</button>
+    </form>
+    <button class="btn greenline" data-go="profile" style="margin-top:14px;margin-bottom:40px">Cancel</button>
+  </section>
+
+  <!-- ==================== Drawer menu ==================== -->
+  <div class="drawer" id="drawer">
+    <div class="scrim" id="drawerScrim"></div>
+    <aside class="panel">
+      <div class="drawer-brand">
+        <span class="db-logo">
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="18.5" r="8.5"/><path d="M14 25 24 41.5 34 25"/></svg>
+        </span>
+        Byahe Go
+      </div>
+      <button class="d-item" data-go="home">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 11 12 4.6 19.2 11v7.8a1.6 1.6 0 0 1-1.6 1.6H6.4a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M9.8 20.5v-5h4.4v5"/></svg>
+        Home
+      </button>
+      <button class="d-item" data-go="trips">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="15" rx="2.4"/><path d="M4 10.6h16M9 3.6v3.6M15 3.6v3.6"/></svg>
+        Trips
+      </button>
+      <button class="d-item" data-go="profile">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.5"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/></svg>
+        Profile
+      </button>
+      <button class="d-item d-sign" id="drawerSignout">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+        Sign out
+      </button>
+      <div class="drawer-foot">Safe rides. Fair fares. Fast.</div>
+    </aside>
+  </div>
+
+  <!-- ==================== Bottom navigation ==================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item" data-nav="home" data-go="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 11 12 4.6 19.2 11v7.8a1.6 1.6 0 0 1-1.6 1.6H6.4a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M9.8 20.5v-5h4.4v5"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-nav="trips" data-go="trips">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="15" rx="2.4"/><path d="M4 10.6h16M9 3.6v3.6M15 3.6v3.6"/></svg>
+      <span>Trips</span>
+    </button>
+    <button class="nav-item" data-nav="profile" data-go="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.5"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- state ---------- */
+const user = { name: 'Alrich Jay Tapoc', phone: '+63 917 555 0124', city: 'Iligan City' };
+const PRICES = { Motorcycle: 80, Car: 120 };
+const QUICK = { Home: 'Sta Felomina Iligan City', School: 'MSU-IIT, Tibanga' };
+let booking = { dest: 'Sta Felomina Iligan City', vehicle: 'Motorcycle', payment: 'Cash' };
+let segFilter = 'Completed';
+let currentTrip = null;
+let rideRAF = 0, rideStart = 0, rideDone = false;
+let refSeq = 24;
+const KM = '4.2 km', MINS = '12 mins';
+
+const trips = [
+  { date: '3 Nov 2026',  time: '10:24 AM', dest: 'Sta Felomina Iligan City', vehicle: 'Motorcycle', payment: 'Cash', km: '4.2 km', mins: '12 mins', price: 80, status: 'Completed', ref: 'BG-261103-024' },
+  { date: '2 Nov 2026',  time: '7:45 AM',  dest: 'MSU-IIT, Tibanga',          vehicle: 'Motorcycle', payment: 'Cash', km: '3.1 km', mins: '9 mins',  price: 65, status: 'Completed', ref: 'BG-261102-023' },
+  { date: '31 Oct 2026', time: '4:10 PM',  dest: 'Robinsons Place Iligan',    vehicle: 'Motorcycle', payment: 'Cash', km: '3.8 km', mins: '11 mins', price: 75, status: 'Completed', ref: 'BG-261031-022' },
+  { date: '30 Oct 2026', time: '2:15 PM',  dest: 'Poblacion, Iligan City',    vehicle: 'Car',        payment: 'Cash', km: '2.9 km', mins: '8 mins',  price: 60, status: 'Cancelled', ref: 'BG-261030-021' }
+];
+
+/* ---------- helpers ---------- */
+const peso = n => '₱' + n;
+const initials = n => n.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 3).toUpperCase();
+const maskPhone = p => { const d = (p || '').replace(/\D/g, ''); return d.length >= 10 ? '+63 ' + d.slice(2, 5) + ' ••• ' + d.slice(-4) : (p || ''); };
+const todayStr = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const nowTime = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+const nextRef = () => { refSeq++; const d = new Date(); const stamp = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); return `BG-${stamp}-${String(100 + refSeq).slice(1)}`; };
+
+let toastTimer = 0;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- navigation ---------- */
+function stopRide() { cancelAnimationFrame(rideRAF); rideRAF = 0; }
+function go(id) {
+  const prev = $('.screen.active');
+  if (prev && prev.id === 'riding') stopRide();
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  const el = $('#' + id);
+  el.classList.add('active'); el.scrollTop = 0;
+  const phone = $('#phone');
+  phone.classList.toggle('nav-on', el.classList.contains('with-nav'));
+  $$('.nav-item').forEach(b => b.classList.toggle('on', b.dataset.nav === el.dataset.tab));
+  if (id === 'home') renderHome();
+  if (id === 'ridebook') renderBooking();
+  if (id === 'trips') renderTrips();
+  if (id === 'tripdetails') renderTrip();
+  if (id === 'profile') renderProfile();
+  if (id === 'editprofile') { $('#epName').value = user.name; $('#epMobile').value = user.phone; $('#epAva').textContent = initials(user.name); }
+  if (id === 'riding') { renderRide(); startRide(); }
+}
+function closeDrawer() { $('#drawer').classList.remove('open'); }
+
+/* ---------- renders ---------- */
+function renderHome() { $('#homeDest').value = booking.dest; }
+function renderBooking() {
+  $('#rbDest').textContent = 'My location → ' + booking.dest;
+  $('#rbMeta').textContent = KM + ' • ' + MINS;
+  $('#rbDestInput').value = booking.dest;
+  $$('.veh').forEach(v => v.classList.toggle('on', v.dataset.v === booking.vehicle));
+  $('#vpMotor').textContent = peso(PRICES.Motorcycle);
+  $('#vpCar').textContent = peso(PRICES.Car);
+  $('#payLbl').textContent = '\u00A0' + booking.payment;
+}
+function renderRide() {
+  $('#rdDest').textContent = booking.dest;
+  $('#rdPill').textContent = 'Trip route: ' + KM + ' • ' + MINS;
+  $('#rmItem').textContent = booking.vehicle + ' • ' + booking.payment;
+  $('#rmPrice').textContent = peso(PRICES[booking.vehicle]);
+}
+function renderComplete(trip) {
+  $('#cmDest').textContent = trip.dest;
+  $('#cmMeta').textContent = trip.vehicle + ' • ' + trip.km + ' • ' + trip.mins;
+  $('#cmFareLbl').textContent = 'Total fare • ' + trip.payment;
+  $('#cmFare').textContent = peso(trip.price);
+  $$('.star').forEach(s => s.classList.remove('on'));
+  $('#cmFeed').value = '';
+}
+function renderTrips() {
+  const list = $('#tripList');
+  const data = trips.filter(t => t.status === segFilter);
+  if (!data.length) {
+    list.innerHTML = `<p style="text-align:center;color:#98A1AC;font-size:15.5px;padding:26px 0">No ${segFilter.toLowerCase()} trips yet.</p>`;
+    return;
+  }
+  list.innerHTML = data.map((t, i) => `
+    <article class="trip-card" data-i="${i}">
+      <div class="tc-top"><span>${t.date} • ${t.time}</span><span class="badge ${t.status === 'Cancelled' ? 'gray' : ''}">${t.status}</span></div>
+      <div class="tc-route">
+        <svg class="pin-ic" width="23" height="23" viewBox="0 0 24 24"><use href="#pinmini" width="24" height="24" color="#FF6A13"/></svg>
+        <span class="tc-name">${t.dest}</span>
+        <svg class="tc-chev" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg>
+      </div>
+      <div class="tc-meta"><span class="m">${t.vehicle} • ${t.payment} • ${t.km}</span><span class="tc-price">${peso(t.price)}</span></div>
+    </article>`).join('');
+  list.querySelectorAll('.trip-card').forEach(c => c.addEventListener('click', () => { currentTrip = data[+c.dataset.i]; go('tripdetails'); }));
+}
+function renderTrip() {
+  const t = currentTrip || trips[0];
+  $('#duDate').textContent = t.date + ' • ' + t.time;
+  const st = $('#duStatus'); st.textContent = t.status; st.classList.toggle('gray', t.status === 'Cancelled');
+  $('#duDest').textContent = t.dest;
+  $('#duPill').textContent = t.vehicle + ' • ' + t.km + ' • ' + t.mins;
+  $('#duFareLbl').textContent = t.vehicle + ' fare';
+  $('#duFare').textContent = peso(t.price);
+  $('#duMethod').textContent = t.payment;
+  $('#duTotal').textContent = peso(t.price);
+  $('#duRef').textContent = 'Trip reference: ' + t.ref;
+}
+function renderProfile() {
+  $('#pfAva').textContent = initials(user.name);
+  $('#pfName').textContent = user.name;
+  $('#pfPhone').textContent = maskPhone(user.phone);
+  $('#drvAva').textContent = initials(user.name);
+}
+
+/* ---------- ride animation ---------- */
+function startRide() {
+  const path = $('#rideRt'), veh = $('#rideVeh');
+  const L = path.getTotalLength();
+  rideDone = false; rideStart = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - rideStart) / 9000);
+    const p = path.getPointAtLength(t * L);
+    veh.setAttribute('transform', `translate(${p.x} ${p.y})`);
+    if (t < 1 && !rideDone) { rideRAF = requestAnimationFrame(step); }
+    if (t >= 1 && !rideDone) { rideDone = true; finishRide(); }
+  };
+  rideRAF = requestAnimationFrame(step);
+}
+function finishRide() {
+  stopRide();
+  const trip = { date: todayStr(), time: nowTime(), dest: booking.dest, vehicle: booking.vehicle, payment: booking.payment, km: KM, mins: MINS, price: PRICES[booking.vehicle], status: 'Completed', ref: nextRef() };
+  trips.unshift(trip); currentTrip = trip;
+  renderComplete(trip);
+  go('complete');
+  toast('You have arrived!');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { closeDrawer(); go(g.dataset.go); return; }
+  const a = e.target.closest('[data-act]');
+  if (a) toast(a.dataset.act);
+  const eye = e.target.closest('[data-eye]');
+  if (eye) { const inp = $('#' + eye.dataset.eye); inp.type = inp.type === 'password' ? 'text' : 'password'; }
+});
+
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!$('#lgMobile').value.trim() || !$('#lgPass').value.trim()) return toast('Enter your mobile number and password');
+  go('home'); toast('Welcome back, ' + user.name.split(' ')[0] + '!');
+});
+$('#registerForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#rgName').value.trim(), mob = $('#rgMobile').value.trim(), pass = $('#rgPass').value;
+  if (!name || !mob || !pass) return toast('Fill in all fields to create an account');
+  if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(pass)) return toast('Use 8+ characters with a mix of letters and numbers');
+  user.name = name; user.phone = mob;
+  renderProfile(); go('home'); toast('Account created — welcome aboard!');
+});
+$('#fpForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!$('#fpMobile').value.trim()) return toast('Enter the mobile number of your account');
+  $('#fpSub').textContent = maskPhone($('#fpMobile').value);
+  toast('Recovery code sent to your mobile number');
+  go('forgot2');
+});
+$$('.code-box').forEach((box, i, all) => {
+  box.addEventListener('input', () => {
+    box.value = box.value.replace(/\D/g, '').slice(0, 1);
+    if (box.value && all[i + 1]) all[i + 1].focus();
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !box.value && all[i - 1]) all[i - 1].focus();
+  });
+});
+$('#btnVerify').addEventListener('click', () => {
+  const code = $$('.code-box').map(b => b.value).join('');
+  if (code.length < 6) return toast('Enter the six-digit code');
+  go('forgot3');
+});
+$('#btnResend').addEventListener('click', () => toast('A new recovery code was sent to your mobile'));
+$('#resetForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = $('#fpNew').value, b = $('#fpConf').value;
+  if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(a)) return toast('Use 8+ characters with a mix of letters and numbers');
+  if (a !== b) return toast('Passwords do not match');
+  toast('Password updated — log in with your new password');
+  go('login');
+});
+
+/* editable destination rows (home + booking) */
+function attachEdit(input, chip, onDone) {
+  let on = false;
+  chip.addEventListener('click', () => {
+    on = !on;
+    chip.textContent = on ? 'Save' : 'Edit';
+    if (on) { input.removeAttribute('readonly'); input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+    else { input.setAttribute('readonly', ''); onDone(input.value.trim() || input.defaultValue); }
+  });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); chip.click(); } });
+}
+attachEdit($('#homeDest'), $('#homeEdit'), v => { booking.dest = v; toast('Destination updated'); });
+attachEdit($('#rbDestInput'), $('#rbEdit'), v => { booking.dest = v; renderBooking(); toast('Destination updated'); });
+
+$$('.choice').forEach(b => b.addEventListener('click', () => {
+  booking.dest = QUICK[b.dataset.quick]; renderHome(); toast('Destination set to ' + booking.dest);
+}));
+$('#btnFind').addEventListener('click', () => { renderBooking(); go('ridebook'); });
+$$('.veh').forEach(v => v.addEventListener('click', () => { booking.vehicle = v.dataset.v; renderBooking(); }));
+$('#payRow').addEventListener('click', () => {
+  booking.payment = booking.payment === 'Cash' ? 'GCash' : 'Cash';
+  renderBooking();
+});
+$('#btnConfirm').addEventListener('click', () => { rideDone = false; go('riding'); });
+
+$('#btnShare').addEventListener('click', () => toast('Trip link copied — share it with someone you trust'));
+$('#btnSos').addEventListener('click', () => toast('SOS sent — your emergency contacts were alerted'));
+$('#btnDone').addEventListener('click', () => { go('home'); toast('Trip saved to your history'); });
+$('#cmReceipt').addEventListener('click', () => { currentTrip = currentTrip || trips[0]; go('tripdetails'); });
+$$('.star').forEach(s => s.addEventListener('click', () => {
+  const r = +s.dataset.s;
+  $$('.star').forEach(x => x.classList.toggle('on', +x.dataset.s <= r));
+}));
+$('#btnHelp').addEventListener('click', () => toast('Our support team will reach out shortly'));
+
+$$('.seg button').forEach(b => b.addEventListener('click', () => {
+  $$('.seg button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); segFilter = b.dataset.f; renderTrips();
+}));
+
+$('#btnMenu').addEventListener('click', () => $('#drawer').classList.add('open'));
+$('#drawerScrim').addEventListener('click', closeDrawer);
+$('#drawerSignout').addEventListener('click', () => signout());
+$('#btnSignout').addEventListener('click', () => signout());
+function signout() { closeDrawer(); toast('Signed out'); go('login'); }
+
+$('#epForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#epName').value.trim(), mob = $('#epMobile').value.trim();
+  if (!name || !mob) return toast('Name and mobile number are required');
+  user.name = name; user.phone = mob;
+  renderProfile(); go('profile'); toast('Profile updated');
+});
+</script>
+</div>
+</body>
+</html>
+
+
+
+

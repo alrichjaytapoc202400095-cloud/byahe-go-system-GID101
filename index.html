@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Byahe Go — Ride Booking App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <!-- ==================== SVG asset definitions (map background, pins) ==================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <g id="mapbg">
+      <rect width="400" height="300" fill="#EBEDF0"/>
+      <path d="M96 0c26 30 18 66 2 96-16 32-10 60 12 84 16 18 14 60-6 120l-62 0c8-60 0-84-22-108-18-20-16-58 4-92C39 74 34 34 44 0Z" fill="#FAFBFC"/>
+      <path d="M230 34c20-12 46-4 54 12 10 20 30 24 48 18 22-8 46 4 50 22 6 26-10 44-32 52-18 8-24 22-20 40 6 24-8 40-30 40-18 0-28-12-32-28-4-18-18-28-34-32-16-4-22-24-14-40 10-22 20-42 10-84z" fill="#FAFBFC"/>
+      <path d="M0 118c40 6 60-18 96-14 34 4 46 26 82 26 38 0 52-22 92-16 40 6 66 28 130 22" fill="none" stroke="#FAFBFC" stroke-width="26" opacity=".9"/>
+      <g stroke="#DFE2E7" stroke-width="1.6">
+        <path d="M22 0V300M60 0V300M98 0V300M136 0V300M174 0V300M212 0V300M250 0V300M288 0V300M326 0V300M364 0V300"/>
+        <path d="M0 28H400M0 62H400M0 96H400M0 130H400M0 164H400M0 198H400M0 232H400M0 266H400"/>
+      </g>
+      <g stroke="#D2D6DC" stroke-width="3.4" fill="none" stroke-linecap="round">
+        <path d="M-10 208C70 190 140 208 210 170S350 90 410 66"/>
+        <path d="M-10 96C60 108 120 70 196 78S320 132 410 120"/>
+        <path d="M60 310C90 236 190 232 250 176S340 60 400 22"/>
+      </g>
+      <g stroke="#E3E6EA" stroke-width="2" fill="none" stroke-linecap="round">
+        <path d="M-10 46C90 40 150 20 410 44"/>
+        <path d="M-10 262C120 268 240 240 410 250"/>
+        <path d="M150 -10C150 60 190 90 180 170S210 260 200 310"/>
+      </g>
+    </g>
+    <symbol id="mappin" viewBox="0 0 24 32" overflow="visible">
+      <path d="M12 1C6.2 1 1.6 5.6 1.6 11.4c0 7.6 10.4 18.6 10.4 18.6S22.4 19 22.4 11.4C22.4 5.6 17.8 1 12 1z" fill="#FF6A13"/>
+      <circle cx="12" cy="11.4" r="3.7" fill="#fff"/>
+    </symbol>
+    <symbol id="pinmini" viewBox="0 0 24 24">
+      <path d="M12 2c-4 0-7.2 3.2-7.2 7.2 0 5.4 7.2 13.6 7.2 13.6s7.2-8.2 7.2-13.6C19.2 5.2 16 2 12 2z" fill="currentColor"/>
+      <circle cx="12" cy="9.4" r="2.7" fill="#fff"/>
+    </symbol>
+    <symbol id="ringdot" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7.2" fill="none" stroke="currentColor" stroke-width="2.7"/>
+      <circle cx="12" cy="12" r="2.7" fill="currentColor"/>
+    </symbol>
+  </defs></svg>
+
+  <!-- ==================== 1 · SPLASH ==================== -->
+  <section class="screen splash active" id="splash">
+    <div class="splash-body">
+      <div class="logo-circle splash-logo" id="splashLogo">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="18.5" r="8.5"/>
+          <path d="M14 25 24 41.5 34 25"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="splash-title">Byahe Go</h1>
+        <p class="splash-tag" style="margin-top:12px">Safe rides. Fair fares. Fast.</p>
+      </div>
+    </div>
+    <button class="btn" data-go="login">Tap to continue</button>
+  </section>
+
+  <!-- ==================== 2 · LOG IN ==================== -->
+  <section class="screen" id="login">
+    <div class="auth-head">
+      <h2 class="auth-brand brand-word">Byahe Go</h2>
+      <div class="logo-circle login-logo">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="18.5" r="8.5"/>
+          <path d="M14 25 24 41.5 34 25"/>
+        </svg>
+      </div>
+      <h1 class="auth-h">Welcome back</h1>
+    </div>
+    <form class="form" id="loginForm" novalidate>
+      <input class="input" id="lgMobile" type="tel" placeholder="Mobile number" autocomplete="tel">
+      <div class="pw-wrap">
+        <input class="input" id="lgPass" type="password" placeholder="Password" autocomplete="current-password">
+      </div>
+      <div class="center-link link-orange" data-go="forgot1" style="font-size:16.5px">Forgot Password</div>
+      <button class="btn" type="submit" style="margin-top:10px">Log in</button>
+    </form>
+    <p class="alt-row">New here? <b class="link-ink brand-word" data-go="register">Register</b></p>
+  </section>
+
+  <!-- ==================== 3 · REGISTER ==================== -->
+  <section class="screen" id="register">
+    <div class="register-head"><h1>Create account</h1></div>
+    <form class="form" id="registerForm" novalidate style="margin-top:40px">
+      <input class="input" id="rgName" type="text" placeholder="Full name" autocomplete="name">
+      <input class="input" id="rgMobile" type="tel" placeholder="Mobile number" autocomplete="tel">
+      <input class="input" id="rgPass" type="password" placeholder="Password" autocomplete="new-password">
+      <p class="hint" style="text-align:center">Use 8+ characters with a mix of letters and numbers.</p>
+      <button class="btn" type="submit" style="margin-top:12px">Register</button>
+    </form>
+    <p class="alt-row">Have an account? <b class="link-ink brand-word" data-go="login">Log in</b></p>
+  </section>
+
+  <!-- ==================== 4 · FORGOT PASSWORD · STEP 1 ==================== -->
+  <section class="screen" id="forgot1">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="login">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 1 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Forgot password?</h1>
+    <p class="page-sub" style="margin-top:14px">Enter the mobile number linked to your account. We’ll send you a recovery code by SMS.</p>
+    <form class="form" id="fpForm" novalidate style="margin-top:30px">
+      <div class="field">
+        <label for="fpMobile">Mobile number</label>
+        <input class="input soft" id="fpMobile" type="tel" value="+63 917 555 0124">
+      </div>
+      <button class="btn" type="submit" style="margin-top:14px">Send code</button>
+    </form>
+    <p class="center-link link-ink brand-word" data-go="login" style="margin-top:26px;font-size:17px;margin-bottom:40px">Back to log in</p>
+  </section>
+
+  <!-- ==================== 5 · FORGOT PASSWORD · STEP 2 (verify code) ==================== -->
+  <section class="screen" id="forgot2">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="forgot1">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 2 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Verify recovery code</h1>
+    <p class="page-sub" style="margin-top:14px">Enter the six-digit code we sent to your mobile number <b id="fpSub" style="color:var(--ink)">+63 917 ••• 0124</b>.</p>
+    <form class="form" novalidate style="margin-top:30px">
+      <div class="field">
+        <label for="c1">Six-digit code</label>
+        <div class="code-row">
+          <input class="code-box" id="c1" type="text" inputmode="numeric" maxlength="1" value="4" autocomplete="one-time-code">
+          <input class="code-box" id="c2" type="text" inputmode="numeric" maxlength="1" value="8">
+          <input class="code-box" id="c3" type="text" inputmode="numeric" maxlength="1" value="2">
+          <input class="code-box" id="c4" type="text" inputmode="numeric" maxlength="1" value="6">
+          <input class="code-box" id="c5" type="text" inputmode="numeric" maxlength="1" value="1">
+          <input class="code-box" id="c6" type="text" inputmode="numeric" maxlength="1" value="9">
+        </div>
+      </div>
+      <button class="btn" type="button" id="btnVerify" style="margin-top:14px">Verify code</button>
+    </form>
+    <p class="center-link" style="margin-top:22px;font-size:16.5px;color:var(--ink-soft)">Didn’t get a code? <span class="link-orange" id="btnResend">Resend code</span></p>
+    <p class="center-link link-ink brand-word" data-go="forgot1" style="margin-top:18px;font-size:17px;margin-bottom:40px">Use a different mobile number</p>
+  </section>
+
+  <!-- ==================== 6 · FORGOT PASSWORD · STEP 3 (reset) ==================== -->
+  <section class="screen" id="forgot3">
+    <div class="brand-block">
+      <div class="word brand-word">Byahe Go</div>
+      <div class="tag">Safe rides. Fair fares. Fast.</div>
+    </div>
+    <div class="step-row">
+      <button class="plain-arrow" data-go="forgot2">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="step-of">Step 3 of 3</span>
+    </div>
+    <h1 class="page-title" style="margin-top:28px">Reset password</h1>
+    <p class="page-sub" style="margin-top:14px">Choose a new password to keep your Byahe Go account secure.</p>
+    <form class="form" id="resetForm" novalidate style="margin-top:28px">
+      <div class="field">
+        <label for="fpNew">New password</label>
+        <div class="pw-wrap">
+          <input class="input soft" id="fpNew" type="password" value="newpass123">
+          <button class="eye" type="button" data-eye="fpNew">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.7"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="hint">Use 8+ characters with a mix of letters and numbers.</p>
+      <div class="field">
+        <label for="fpConf">Confirm new password</label>
+        <div class="pw-wrap">
+          <input class="input soft" id="fpConf" type="password" value="newpass123">
+          <button class="eye" type="button" data-eye="fpConf">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.7"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn" type="submit" style="margin-top:14px">Reset password</button>
+    </form>
+    <p class="center-link link-ink brand-word" data-go="login" style="margin-top:24px;font-size:17px;margin-bottom:40px">Back to log in</p>
+  </section>
+
+  <!-- ==================== 7 · HOME / BOOKING ==================== -->
+  <section class="screen with-nav" id="home" data-tab="home">
+    <div class="home-top">
+      <button class="hamburger" id="btnMenu">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"/></svg>
+      </button>
+      <div class="word brand-word">Byahe Go</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:300px">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path d="M100 78 L138 118 L158 140 L184 124 L198 162 L228 196 L256 210 L268 216" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="46" height="62" x="77" y="20"/>
+        <use href="#mappin" width="46" height="62" x="245" y="158"/>
+      </svg>
+    </div>
+    <div class="rowbox">
+      <span class="rb-ic">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5C8.6 18.4 4.8 14.3 4.8 10a7.2 7.2 0 1 1 14.4 0c0 4.3-3.8 8.4-7.2 11.5z"/><circle cx="12" cy="10" r="2.7"/></svg>
+      </span>
+      Pickup: My location
+    </div>
+    <div class="dest-row">
+      <input id="homeDest" value="Sta Felomina Iligan City" readonly>
+      <button class="edit-chip" id="homeEdit">Edit</button>
+    </div>
+    <div class="choice-row">
+      <button class="choice" data-quick="Home">Home</button>
+      <button class="choice" data-quick="School">School</button>
+    </div>
+    <button class="btn" id="btnFind" style="margin-top:18px">Find a ride</button>
+    <div class="nav-space"></div>
+  </section>
+
+  <!-- ==================== 8 · CHOOSE YOUR RIDE ==================== -->
+  <section class="screen" id="ridebook">
+    <div class="topbar">
+      <button class="icon-led" data-go="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Choose your ride</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:212px;margin-top:12px">
+      <svg viewBox="0 10 400 240" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path d="M96 62 L134 100 L154 122 L182 104 L198 142 L228 176 L256 190 L270 196" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="40" height="54" x="76" y="11"/>
+        <use href="#mappin" width="40" height="54" x="250" y="145"/>
+        <g transform="translate(196 136)">
+          <circle r="16.5" fill="#146B43" stroke="#fff" stroke-width="3"/>
+          <path d="M-6 -5.4 L7.3 0 L-6 5.4 L-2.8 0 Z" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="routecard" style="margin:16px 24px 0">
+      <div class="rc-lbl">Route</div>
+      <div class="rc-name" id="rbDest">My location → Sta Felomina Iligan City</div>
+      <div class="rc-meta" id="rbMeta">4.2 km • 12 mins</div>
+    </div>
+    <div class="dest-row" style="margin-top:14px;background:#fff;border-color:var(--line-strong)">
+      <span style="font-weight:600">To:</span>
+      <input id="rbDestInput" value="Sta Felomina Iligan City" readonly>
+      <button class="edit-chip" id="rbEdit">Edit</button>
+    </div>
+    <h3 class="sec" style="margin-bottom:14px">Vehicle options</h3>
+    <div class="option-list">
+      <button class="veh on" data-v="Motorcycle">
+        <span class="vn">Motorcycle</span><span class="vp" id="vpMotor">₱80</span>
+      </button>
+      <button class="veh" data-v="Car">
+        <span class="vn">Car</span><span class="vp" id="vpCar">₱120</span>
+      </button>
+    </div>
+    <button class="payrow" id="payRow" style="margin:18px 24px 0">Payment: <span id="payLbl" style="color:var(--ink);font-weight:600">&nbsp;Cash</span></button>
+    <button class="btn" id="btnConfirm" style="margin-top:28px">Confirm booking</button>
+    <div style="height:44px;flex:none"></div>
+  </section>
+
+  <!-- ==================== 9 · RIDE IN PROGRESS ==================== -->
+  <section class="screen" id="riding">
+    <div class="topbar">
+      <button class="icon-led" data-go="ridebook">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title green">Ride in progress</div>
+      <span></span>
+    </div>
+    <div class="map" style="height:298px">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+        <path id="rideRt" d="M100 78 L138 118 L158 140 L184 124 L198 162 L228 196 L256 210 L268 216" style="stroke:#146B43;stroke-width:7;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+        <use href="#mappin" width="46" height="62" x="77" y="20"/>
+        <use href="#mappin" width="46" height="62" x="245" y="158"/>
+        <g id="rideVeh" transform="translate(100 78)">
+          <circle r="17" fill="#146B43" stroke="#fff" stroke-width="3.2"/>
+          <path d="M-6.3 -5.6 L7.5 0 L-6.3 5.6 L-2.9 0 Z" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="meta-pill" style="margin-top:14px" id="rdPill">Trip route: 4.2 km • 12 mins</div>
+    <div class="onway" style="margin:14px 24px 0">
+      <div class="lbl">On your way to</div>
+      <div class="val" id="rdDest">Sta Felomina Iligan City</div>
+    </div>
+    <div class="driver-card">
+      <span class="avatar" style="width:56px;height:56px;font-size:17px" id="drvAva">AJT</span>
+      <div>
+        <div class="drv-name">Alrich Jay Tapoc</div>
+        <div class="drv-sub">Honda Click ABC 123</div>
+      </div>
+      <div class="drv-rate">4.9/5</div>
+    </div>
+    <div class="ride-meta">
+      <span class="l" id="rmItem">Motorcycle • Cash</span>
+      <span class="v" id="rmPrice">₱80</span>
+    </div>
+    <div class="action-row">
+      <button class="btn-ghost bg-green" id="btnShare">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.4 10.8 7.2-4.4M8.4 13.2l7.2 4.4"/></svg>
+        Share trip
+      </button>
+      <button class="btn-ghost bg-red" id="btnSos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="M12 8v5M12 16.2h.01"/></svg>
+        SOS
+      </button>
+    </div>
+    <div class="sos-note">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="m9.3 11.8 2 2 4-4"/></svg>
+      <p>Share your trip with someone you trust. Use SOS if you need urgent help.</p>
+    </div>
+    <div class="stay">Enjoy your ride. Stay safe!</div>
+  </section>
+
+  <!-- ==================== 10 · RIDE COMPLETE ==================== -->
+  <section class="screen" id="complete">
+    <div class="topbar">
+      <button class="icon-led" data-go="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title green" style="color:#2F5B38">Ride complete</div>
+      <span></span>
+    </div>
+    <div class="arrive-ic">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#2F6B3F" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.2 4.2L19 7"/></svg>
+    </div>
+    <h1 class="arrive-title">You’ve arrived!</h1>
+    <div class="arrive-dest" id="cmDest">Sta Felomina Iligan City</div>
+    <div class="arrive-meta" id="cmMeta">Motorcycle • 4.2 km • 12 mins</div>
+    <div class="farecard" style="margin:28px 24px 0">
+      <div class="fare-label" id="cmFareLbl">Total fare • Cash</div>
+      <div class="fare-amount" id="cmFare">₱80</div>
+      <div class="fare-sub">Please pay your driver in cash.</div>
+    </div>
+    <h2 class="rate-title">How was your ride?</h2>
+    <div class="star-row">
+      <button class="star" data-s="1" aria-label="1 star"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="2" aria-label="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="3" aria-label="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="4" aria-label="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+      <button class="star" data-s="5" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.2l-5.8 3 1.1-6.4L2.7 9.3l6.4-.9z"/></svg></button>
+    </div>
+    <p class="rate-hint">Tap a star to rate Alrich</p>
+    <div class="field" style="padding:0 24px;margin-top:26px">
+      <label>Feedback (optional)</label>
+      <textarea class="input soft" id="cmFeed" placeholder="Tell us about your ride"></textarea>
+    </div>
+    <button class="btn black" id="btnDone" style="margin-top:26px">Done — Back to Home</button>
+    <p class="receipt-link" id="cmReceipt">View trip receipt</p>
+  </section>
+
+  <!-- ==================== 11 · TRIPS ==================== -->
+  <section class="screen with-nav" id="trips" data-tab="trips">
+    <h1 class="page-title" style="margin-top:42px">Trips</h1>
+    <div class="seg">
+      <button class="on" data-f="Completed">Completed</button>
+      <button data-f="Cancelled">Cancelled</button>
+    </div>
+    <p class="sec" style="font-size:18px;margin-top:26px">Recent trips</p>
+    <div class="trip-list" id="tripList" style="padding-bottom:116px"></div>
+  </section>
+
+  <!-- ==================== 12 · TRIP DETAILS ==================== -->
+  <section class="screen" id="tripdetails">
+    <div class="topbar">
+      <button class="icon-led" data-go="trips">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Trip details</div>
+      <span></span>
+    </div>
+    <div class="td-top">
+      <span class="td-date" id="duDate">3 Nov 2026 • 10:24 AM</span>
+      <span class="td-status" id="duStatus">Completed</span>
+    </div>
+    <div class="map" style="height:150px;margin-top:14px">
+      <svg viewBox="0 30 400 250" preserveAspectRatio="xMidYMid slice">
+        <use href="#mapbg" width="400" height="300"/>
+      </svg>
+    </div>
+    <div class="loc-wrap">
+      <div class="loc-row">
+        <span class="loc-ic"><svg width="23" height="23" viewBox="0 0 24 24"><use href="#ringdot" width="24" height="24" color="#FF6A13"/></svg></span>
+        <div><div class="loc-lbl">Pickup</div><div class="loc-val">My location</div></div>
+      </div>
+      <div class="loc-row">
+        <span class="loc-ic"><svg width="23" height="23" viewBox="0 0 24 24"><use href="#pinmini" width="24" height="24" color="#FF6A13"/></svg></span>
+        <div><div class="loc-lbl">Destination</div><div class="loc-val" id="duDest">Sta Felomina Iligan City</div></div>
+      </div>
+    </div>
+    <div class="meta-pill" id="duPill">Motorcycle • 4.2 km • 12 mins</div>
+    <div class="driver-card">
+      <span class="avatar" style="width:56px;height:56px;font-size:17px">AJT</span>
+      <div>
+        <div class="drv-name">Alrich Jay Tapoc</div>
+        <div class="drv-sub">Honda Click ABC 123</div>
+      </div>
+      <div class="drv-rate">4.9/5</div>
+    </div>
+    <div class="receipt">
+      <h3>Payment receipt</h3>
+      <div class="r-row"><span id="duFareLbl">Motorcycle fare</span><b id="duFare">₱80</b></div>
+      <div class="r-row"><span>Payment method</span><b id="duMethod">Cash</b></div>
+      <div class="r-total"><span>Total paid</span><b id="duTotal">₱80</b></div>
+    </div>
+    <button class="btn ghost" id="btnHelp" style="margin-top:22px;font-weight:800">Get help with this trip</button>
+    <p class="tagline-center" style="margin:18px 0 40px" id="duRef">Trip reference: BG-261103-024</p>
+  </section>
+
+  <!-- ==================== 13 · PROFILE ==================== -->
+  <section class="screen with-nav" id="profile" data-tab="profile">
+    <h1 class="page-title" style="margin-top:42px">Profile</h1>
+    <div class="rep-header">
+      <span class="avatar rep-ava" id="pfAva">AJT</span>
+      <div class="rep-name" id="pfName">Alrich Jay Tapoc</div>
+      <div class="rep-phone" id="pfPhone">+63 917 ••• 0124</div>
+      <div class="rep-sub">Byahe Go rider • Iligan City</div>
+    </div>
+    <div class="menu-col">
+      <button class="menu-item" data-go="editprofile">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.2 8.8a2.3 2.3 0 0 0-3.2-3.2L4.6 16.2 4 20z"/><path d="M14.5 7.3l2.2 2.2"/></svg></span>
+        <span><span class="mi-title">Edit profile</span><div class="mi-sub">Update your name and mobile number</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Saved places coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-4.4L6 20V5.5a1 1 0 0 1 1-1z"/></svg></span>
+        <span><span class="mi-title">Saved places</span><div class="mi-sub">Home and School</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Safety center coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3z"/><path d="m9.3 11.8 2 2 4-4"/></svg></span>
+        <span><span class="mi-title">Safety</span><div class="mi-sub">Emergency contacts and ride safety</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+      <button class="menu-item" data-act="Help center coming soon in this prototype">
+        <span class="mi-bubble"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.3c-.75.35-1 .95-1 1.7M12 17h.01"/></svg></span>
+        <span><span class="mi-title">Help center</span><div class="mi-sub">Trip support and common questions</div></span>
+        <span class="mi-chev"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5.5 6.5 6.5L9 18.5"/></svg></span>
+      </button>
+    </div>
+    <button class="btn greenline" id="btnSignout" style="margin-top:26px;display:flex;gap:10px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+      Sign out
+    </button>
+    <p class="tagline-center" style="padding-bottom:0">Safe rides. Fair fares. Fast.</p>
+    <div class="nav-space"></div>
+  </section>
+
+  <!-- ==================== 14 · EDIT PROFILE ==================== -->
+  <section class="screen" id="editprofile">
+    <div class="topbar">
+      <button class="icon-led" data-go="profile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="t-title">Edit profile</div>
+      <span></span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px">
+      <span class="avatar" style="width:96px;height:96px;font-size:27px" id="epAva">AJT</span>
+      <p style="color:#64707E;font-size:17px;text-align:center;margin-top:22px;padding:0 26px;line-height:1.55">Keep your details up to date so your driver can reach you.</p>
+    </div>
+    <form class="form" id="epForm" novalidate style="margin-top:28px">
+      <div class="field">
+        <label for="epName">Full name</label>
+        <input class="input soft" id="epName" value="Alrich Jay Tapoc">
+      </div>
+      <div class="field">
+        <label for="epMobile">Mobile number</label>
+        <input class="input soft" id="epMobile" type="tel" value="+63 917 555 0124">
+      </div>
+      <p class="hint">Use an active Philippine mobile number for ride updates and account recovery.</p>
+      <button class="btn" type="submit" style="margin-top:16px">Save changes</button>
+    </form>
+    <button class="btn greenline" data-go="profile" style="margin-top:14px;margin-bottom:40px">Cancel</button>
+  </section>
+
+  <!-- ==================== Drawer menu ==================== -->
+  <div class="drawer" id="drawer">
+    <div class="scrim" id="drawerScrim"></div>
+    <aside class="panel">
+      <div class="drawer-brand">
+        <span class="db-logo">
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="18.5" r="8.5"/><path d="M14 25 24 41.5 34 25"/></svg>
+        </span>
+        Byahe Go
+      </div>
+      <button class="d-item" data-go="home">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 11 12 4.6 19.2 11v7.8a1.6 1.6 0 0 1-1.6 1.6H6.4a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M9.8 20.5v-5h4.4v5"/></svg>
+        Home
+      </button>
+      <button class="d-item" data-go="trips">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="15" rx="2.4"/><path d="M4 10.6h16M9 3.6v3.6M15 3.6v3.6"/></svg>
+        Trips
+      </button>
+      <button class="d-item" data-go="profile">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.5"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/></svg>
+        Profile
+      </button>
+      <button class="d-item d-sign" id="drawerSignout">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+        Sign out
+      </button>
+      <div class="drawer-foot">Safe rides. Fair fares. Fast.</div>
+    </aside>
+  </div>
+
+  <!-- ==================== Bottom navigation ==================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item" data-nav="home" data-go="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 11 12 4.6 19.2 11v7.8a1.6 1.6 0 0 1-1.6 1.6H6.4a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M9.8 20.5v-5h4.4v5"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-nav="trips" data-go="trips">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="15" rx="2.4"/><path d="M4 10.6h16M9 3.6v3.6M15 3.6v3.6"/></svg>
+      <span>Trips</span>
+    </button>
+    <button class="nav-item" data-nav="profile" data-go="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.5"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="js/app.js"></script>
+</div>
+</body>
+</html>
+
+
+
+
